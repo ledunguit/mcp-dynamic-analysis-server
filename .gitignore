@@ -23,7 +23,6 @@ examples/vulnerable/bin/
 
 # Env
 .env
-.env.*
 
 # OS
 .DS_Store
