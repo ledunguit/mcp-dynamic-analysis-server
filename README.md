@@ -24,15 +24,19 @@ Tools are registered in `app.py` and can be extended with additional dynamic-ana
 
 ## Environment Requirements
 
+### Option A: Docker (recommended, no host Valgrind needed)
+- Docker + Docker Compose
+
+### Option B: Host (advanced)
 - Python 3.11+ (pyenv recommended)
-- Valgrind installed locally
+- Valgrind installed locally (Linux)
 - A C compiler (`cc` or `clang`) for example binaries
 
 ## Configuration
 
 Set `WORKSPACE_ROOT` to the root directory you want to allow for execution. By default it is the project root. All `target_path`, `cwd`, and suppression files must resolve under this directory.
 
-## Setup (pyenv)
+## Setup (pyenv) [Host Only]
 
 ```bash
 pyenv virtualenv 3.12.8 mcp-da
@@ -40,7 +44,7 @@ pyenv local mcp-da
 pip install -e .[test]
 ```
 
-## Install Valgrind
+## Install Valgrind [Host Only]
 
 On macOS (Homebrew):
 
@@ -58,7 +62,7 @@ sudo apt-get update && sudo apt-get install -y valgrind
 
 Valgrind is Linux-only. On macOS, use Docker to run the server and tools inside a Linux container.
 
-Build and run the MCP server over HTTP:
+Build and run the MCP server over HTTP (Valgrind runs inside the container):
 
 ```bash
 docker compose up --build
@@ -70,15 +74,23 @@ Artifacts will be written to `runs/` on the host via the volume mount.
 
 ## Build Example Vulnerable Binaries
 
+If running on host (no Docker):
+
 ```bash
 make -C examples/vulnerable
+```
+
+If running in Docker (recommended):
+
+```bash
+docker compose exec -T mcp-da make -C examples/vulnerable
 ```
 
 Outputs:
 - `examples/vulnerable/bin/invalid_read`
 - `examples/vulnerable/bin/leak`
 
-## Start MCP Server (STDIO)
+## Start MCP Server (STDIO) [Host Only]
 
 ```bash
 mcp-da-server
