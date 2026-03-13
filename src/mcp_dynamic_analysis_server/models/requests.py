@@ -8,7 +8,11 @@ from pydantic import BaseModel, Field, ConfigDict
 class AnalyzeMemcheckRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    target_path: str
+    target_path: Optional[str] = None
+    target_url: Optional[str] = None
+    artifact_id: Optional[str] = None
+    target_sha256: Optional[str] = None
+    download_timeout_sec: Optional[int] = None
     args: List[str] = Field(default_factory=list)
     cwd: Optional[str] = None
     timeout_sec: int = Field(default=60, gt=0, le=3600)
@@ -51,3 +55,13 @@ class RawArtifactRequest(BaseModel):
 
     run_id: str
     artifact_type: str
+
+
+class CreateUploadUrlRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    filename: str
+    content_type: Optional[str] = None
+    size_bytes: Optional[int] = None
+    sha256: Optional[str] = None
+    expires_sec: Optional[int] = None

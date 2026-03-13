@@ -36,6 +36,10 @@ Tools are registered in `app.py` and can be extended with additional dynamic-ana
 
 Set `WORKSPACE_ROOT` to the root directory you want to allow for execution. By default it is the project root. All `target_path`, `cwd`, and suppression files must resolve under this directory.
 
+For R2 uploads, configure credentials in `.env` (see `.env.example`).
+`R2_ENDPOINT` is used for SDK/presigning, while `R2_ALLOW_HOSTS` controls which hosts are allowed for downloads. If you use a custom public domain for R2, set `R2_ALLOW_HOSTS` to that domain (and optionally also include the raw R2 endpoint host as a fallback). **Use hostnames only (no scheme).**
+Optional: enable `R2_HEALTHCHECK_ON_STARTUP=true` to run a quick `head_bucket` at startup (timeout via `R2_HEALTHCHECK_TIMEOUT_SEC`). Failures are logged as warnings and do not stop the server.
+
 ## Setup (pyenv) [Host Only]
 
 ```bash
@@ -161,6 +165,24 @@ Input (example):
 }
 ```
 
+For remote/public servers, you can upload a binary to R2 and pass `artifact_id` or a `target_url`:
+
+```json
+{
+  "artifact_id": "abcd1234",
+  "args": [],
+  "cwd": "/app/workdir",
+  "timeout_sec": 60,
+  "track_origins": true,
+  "leak_check": "full",
+  "show_leak_kinds": "all",
+  "xml": true,
+  "suppressions": [],
+  "env": {},
+  "stdin": ""
+}
+```
+
 Output (summary):
 
 ```json
@@ -266,6 +288,33 @@ Output:
   "content": "...",
   "truncated": false,
   "size_bytes": 12345
+}
+```
+
+### `artifact.create_upload_url`
+
+Create a presigned R2 upload URL for binaries.
+
+Input:
+
+```json
+{
+  "filename": "app.bin",
+  "content_type": "application/octet-stream",
+  "size_bytes": 123456,
+  "sha256": "..."
+}
+```
+
+Output:
+
+```json
+{
+  "artifact_id": "abcd1234",
+  "upload_url": "https://...presigned-put...",
+  "download_url": "https://...presigned-get...",
+  "expires_in_sec": 900,
+  "key": "uploads/abcd1234/app.bin"
 }
 ```
 

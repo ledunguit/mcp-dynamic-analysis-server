@@ -2,22 +2,27 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import os
 import sys
 from typing import Any, Callable, Dict
 
 from . import __version__
+from .config import load_settings
 from .http_server import run_http
 from .logging_config import configure_logging
+from .core.r2_client import R2Client, R2Config
 from .prompts.judge_guidance import JUDGE_GUIDANCE
 from .resources.artifact_resources import list_resources, read_resource
 from .tools.analyze_memcheck import analyze_memcheck
 from .tools.compare_runs import compare_runs
+from .tools.create_upload_url import create_upload_url
 from .tools.get_raw_artifact import get_raw_artifact
 from .tools.get_report import get_report
 from .tools.list_findings import list_findings
 from .models.requests import (
     AnalyzeMemcheckRequest,
+    CreateUploadUrlRequest,
     CompareRunsRequest,
     GetReportRequest,
     ListFindingsRequest,
@@ -57,6 +62,11 @@ TOOLS: Dict[str, Dict[str, Any]] = {
         "handler": get_raw_artifact,
         "description": "Fetch raw artifact content for a run.",
         "input_schema": _tool_schema(RawArtifactRequest),
+    },
+    "artifact.create_upload_url": {
+        "handler": create_upload_url,
+        "description": "Create a presigned upload URL for R2.",
+        "input_schema": _tool_schema(CreateUploadUrlRequest),
     },
 }
 
@@ -186,6 +196,7 @@ def _handle_message(message: Dict[str, Any]) -> Dict[str, Any] | None:
 
 def run_stdio() -> None:
     configure_logging()
+    _log_startup("stdio")
     for line in sys.stdin:
         line = line.strip()
         if not line:
@@ -206,6 +217,7 @@ def run_stdio() -> None:
 
 def run_http_server(host: str, port: int) -> None:
     configure_logging()
+    _log_startup("http", host=host, port=port)
     run_http(_handle_message, host=host, port=port)
 
 
@@ -224,6 +236,63 @@ def main() -> None:
         run_http_server(args.host, args.port)
     else:
         run_stdio()
+
+
+def _log_startup(transport: str, host: str | None = None, port: int | None = None) -> None:
+    settings = load_settings()
+    logger = logging.getLogger("mcp_dynamic_analysis_server")
+
+    r2_configured = all(
+        [
+            settings.r2_endpoint,
+            settings.r2_access_key_id,
+            settings.r2_secret_access_key,
+            settings.r2_bucket,
+        ]
+    )
+
+    logger.info("Starting MCP server transport=%s version=%s", transport, __version__)
+    if transport == "http":
+        logger.info("HTTP bind %s:%s", host, port)
+
+    logger.info("WORKSPACE_ROOT=%s", settings.workspace_root)
+    logger.info("RUNS_DIR=%s", settings.runs_dir)
+    logger.info("ARTIFACTS_DIR=%s", settings.artifacts_dir)
+    logger.info("VALGRIND_BIN=%s", settings.valgrind_bin)
+    logger.info("R2 configured=%s endpoint=%s bucket=%s region=%s ssl=%s prefix=%s",
+                r2_configured,
+                settings.r2_endpoint,
+                settings.r2_bucket,
+                settings.r2_region,
+                settings.r2_use_ssl,
+                settings.r2_upload_prefix)
+    logger.info("R2 limits max_upload_bytes=%s download_timeout_sec=%s allow_hosts=%s",
+                settings.r2_max_upload_bytes,
+                settings.r2_download_timeout_sec,
+                settings.r2_allow_hosts)
+
+    if r2_configured and settings.r2_healthcheck_on_startup:
+        try:
+            r2 = R2Client(
+                R2Config(
+                    endpoint=settings.r2_endpoint or "",
+                    access_key_id=settings.r2_access_key_id or "",
+                    secret_access_key=settings.r2_secret_access_key or "",
+                    bucket=settings.r2_bucket or "",
+                    region=settings.r2_region,
+                    use_ssl=settings.r2_use_ssl,
+                    presign_expires_sec=settings.r2_presign_expires_sec,
+                    upload_prefix=settings.r2_upload_prefix,
+                    request_timeout_sec=settings.r2_healthcheck_timeout_sec,
+                )
+            )
+            ok, err = r2.health_check()
+            if ok:
+                logger.info("R2 healthcheck: OK")
+            else:
+                logger.warning("R2 healthcheck failed: %s", err)
+        except Exception as exc:
+            logger.warning("R2 healthcheck error: %s", exc)
 
 
 if __name__ == "__main__":

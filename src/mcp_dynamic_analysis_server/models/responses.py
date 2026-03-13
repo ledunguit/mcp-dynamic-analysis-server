@@ -57,3 +57,11 @@ class RawArtifactResponse(BaseModel):
     truncated: bool = False
     size_bytes: Optional[int] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
+
+
+class UploadUrlResponse(BaseModel):
+    artifact_id: str
+    upload_url: str
+    download_url: str
+    expires_in_sec: int
+    key: str

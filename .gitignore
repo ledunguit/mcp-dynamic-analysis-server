@@ -18,6 +18,7 @@ dist/
 
 # Artifacts
 runs/
+artifacts/
 examples/vulnerable/bin/
 
 # Env
