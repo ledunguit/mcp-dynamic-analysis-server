@@ -1,0 +1,14 @@
+{
+  "target_path": "examples/vulnerable/bin/invalid_read",
+  "args": [],
+  "cwd": "examples/vulnerable",
+  "timeout_sec": 30,
+  "track_origins": true,
+  "leak_check": "full",
+  "show_leak_kinds": "all",
+  "xml": true,
+  "suppressions": [],
+  "env": {},
+  "stdin": "",
+  "labels": ["demo"]
+}

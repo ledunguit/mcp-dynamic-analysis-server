@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.20"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-dynamic-analysis-server"
+version = "0.1.0"
+description = "Local MCP server for dynamic analysis tools (like Valgrind Memcheck, AddressSanitizer, etc.)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Le Dang Dung - ledung.itsme@gmail.com" }
+]
+dependencies = [
+  "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8.0",
+]
+
+[project.scripts]
+mcp-da-server = "mcp_dynamic_analysis_server.app:main"
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]

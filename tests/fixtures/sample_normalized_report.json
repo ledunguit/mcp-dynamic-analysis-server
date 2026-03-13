@@ -1,0 +1,41 @@
+{
+  "run_id": "20260101-000000-deadbeef",
+  "tool": "memcheck",
+  "generated_at": "2026-01-01T00:00:00Z",
+  "stats": {
+    "finding_count": 2,
+    "high": 1,
+    "medium": 1,
+    "low": 0
+  },
+  "findings": [
+    {
+      "finding_id": "mc-0001",
+      "tool": "memcheck",
+      "kind": "InvalidRead",
+      "severity": "high",
+      "confidence": "high",
+      "message": "Invalid read of size 4",
+      "location": {"file": "src/main.c", "line": 12, "function": "parse_input"},
+      "stack": [{"function": "parse_input", "file": "src/main.c", "line": 12}],
+      "aux": {"size": 4},
+      "origin": {},
+      "evidence": {"xml_path": "runs/2026/valgrind.xml", "log_path": "runs/2026/valgrind.log"},
+      "signature": "sig-invalid-read"
+    },
+    {
+      "finding_id": "mc-0002",
+      "tool": "memcheck",
+      "kind": "Leak_DefinitelyLost",
+      "severity": "medium",
+      "confidence": "medium",
+      "message": "64 bytes in 1 blocks are definitely lost",
+      "location": {"file": "src/leak.c", "line": 8, "function": "make_leak"},
+      "stack": [{"function": "make_leak", "file": "src/leak.c", "line": 8}],
+      "aux": {"leak": {"bytes": 64, "blocks": 1, "kind": "definitely lost"}},
+      "origin": {},
+      "evidence": {"xml_path": "runs/2026/valgrind.xml", "log_path": "runs/2026/valgrind.log"},
+      "signature": "sig-leak"
+    }
+  ]
+}

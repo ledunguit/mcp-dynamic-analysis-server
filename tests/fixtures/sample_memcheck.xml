@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<valgrindoutput>
+  <error>
+    <kind>InvalidRead</kind>
+    <xwhat>
+      <text>Invalid read of size 4</text>
+    </xwhat>
+    <stack>
+      <frame>
+        <fn>parse_input</fn>
+        <file>src/main.c</file>
+        <line>12</line>
+      </frame>
+    </stack>
+  </error>
+  <error>
+    <kind>Leak_DefinitelyLost</kind>
+    <xwhat>
+      <text>64 bytes in 1 blocks are definitely lost</text>
+      <leak>
+        <bytes>64</bytes>
+        <blocks>1</blocks>
+        <kind>definitely lost</kind>
+      </leak>
+    </xwhat>
+    <stack>
+      <frame>
+        <fn>make_leak</fn>
+        <file>src/leak.c</file>
+        <line>8</line>
+      </frame>
+    </stack>
+  </error>
+</valgrindoutput>

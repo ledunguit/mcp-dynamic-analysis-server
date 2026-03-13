@@ -1,0 +1,13 @@
+services:
+  mcp-da:
+    build: .
+    working_dir: /app
+    environment:
+      WORKSPACE_ROOT: /app
+      RUNS_DIR: /app/runs
+      VALGRIND_BIN: valgrind
+      LOG_LEVEL: INFO
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"

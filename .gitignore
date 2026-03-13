@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+.venv/
+.venv-*/
+
+# Packaging
+build/
+dist/
+
+# Tests
+.pytest_cache/
+
+# Artifacts
+runs/
+examples/vulnerable/bin/
+
+# Env
+.env
+.env.*
+
+# OS
+.DS_Store
+
+# Logs
+*.log
