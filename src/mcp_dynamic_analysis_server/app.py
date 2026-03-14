@@ -15,6 +15,7 @@ from .core.r2_client import R2Client, R2Config
 from .prompts.judge_guidance import JUDGE_GUIDANCE
 from .resources.artifact_resources import list_resources, read_resource
 from .tools.analyze_memcheck import analyze_memcheck
+from .tools.asan_run import asan_run
 from .tools.compare_runs import compare_runs
 from .tools.create_upload_url import create_upload_url
 from .tools.get_raw_artifact import get_raw_artifact
@@ -22,6 +23,7 @@ from .tools.get_report import get_report
 from .tools.list_findings import list_findings
 from .models.requests import (
     AnalyzeMemcheckRequest,
+    AsanRunRequest,
     CreateUploadUrlRequest,
     CompareRunsRequest,
     GetReportRequest,
@@ -67,6 +69,11 @@ TOOLS: Dict[str, Dict[str, Any]] = {
         "handler": create_upload_url,
         "description": "Create a presigned upload URL for R2.",
         "input_schema": _tool_schema(CreateUploadUrlRequest),
+    },
+    "asan.run": {
+        "handler": asan_run,
+        "description": "Run an AddressSanitizer-instrumented binary and parse findings.",
+        "input_schema": _tool_schema(AsanRunRequest),
     },
 }
 

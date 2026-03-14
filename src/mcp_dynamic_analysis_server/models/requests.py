@@ -65,3 +65,17 @@ class CreateUploadUrlRequest(BaseModel):
     size_bytes: Optional[int] = None
     sha256: Optional[str] = None
     expires_sec: Optional[int] = None
+
+
+class AsanRunRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    target_path: str
+    args: List[str] = Field(default_factory=list)
+    cwd: Optional[str] = None
+    timeout_sec: int = Field(default=60, gt=0, le=3600)
+    env: Dict[str, str] = Field(default_factory=dict)
+    stdin: Optional[str] = None
+    asan_options: Optional[str] = None
+    lsan_options: Optional[str] = None
+    labels: List[str] = Field(default_factory=list)

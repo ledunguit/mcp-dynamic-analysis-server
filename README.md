@@ -84,10 +84,22 @@ If running on host (no Docker):
 make -C examples/vulnerable
 ```
 
+For AddressSanitizer builds:
+
+```bash
+make -C examples/vulnerable asan
+```
+
 If running in Docker (recommended):
 
 ```bash
 docker compose exec -T mcp-da make -C examples/vulnerable
+```
+
+For AddressSanitizer builds in Docker:
+
+```bash
+docker compose exec -T mcp-da make -C examples/vulnerable asan
 ```
 
 Outputs:
@@ -290,6 +302,27 @@ Output:
   "size_bytes": 12345
 }
 ```
+
+### `asan.run`
+
+Run an AddressSanitizer-instrumented binary (built with `-fsanitize=address`).
+
+Input:
+
+```json
+{
+  "target_path": "examples/vulnerable/bin/leak_asan",
+  "args": [],
+  "cwd": "examples/vulnerable",
+  "timeout_sec": 30,
+  "asan_options": "detect_leaks=1",
+  "lsan_options": "",
+  "env": {},
+  "stdin": ""
+}
+```
+
+Output shape matches `valgrind.analyze_memcheck` (normalized findings).
 
 ### `artifact.create_upload_url`
 
